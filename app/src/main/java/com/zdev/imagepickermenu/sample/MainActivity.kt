@@ -1,9 +1,9 @@
 package com.zdev.imagepickermenu.sample
 
 import android.os.Bundle
-import com.zdev.library.view.BaseActivity
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : BaseActivity() {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
