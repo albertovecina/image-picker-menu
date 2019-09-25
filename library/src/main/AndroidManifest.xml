@@ -7,7 +7,7 @@
     <application>
 
         <activity
-            android:name=".view.PicturePickerActivity"
+            android:name=".view.ImageRequestActivity"
             android:theme="@style/Theme.Transparent" />
 
         <provider

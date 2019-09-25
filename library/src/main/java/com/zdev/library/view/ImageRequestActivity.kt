@@ -19,7 +19,7 @@ import com.zdev.rentspace.view.utils.extensions.getAbsolutePath
 /**
  * Created by Alberto Vecina Sánchez on 2019-09-13.
  */
-class PicturePickerActivity : AppCompatActivity() {
+class ImageRequestActivity : AppCompatActivity() {
 
     companion object {
 
@@ -34,7 +34,7 @@ class PicturePickerActivity : AppCompatActivity() {
 
         fun requestFromCamera(context: Context, listener: ((filePath: String) -> Unit)) {
             onTakePictureListener = listener
-            Intent(context, PicturePickerActivity::class.java).run {
+            Intent(context, ImageRequestActivity::class.java).run {
                 putExtra(EXTRA_ACTION, REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(this)
@@ -45,7 +45,7 @@ class PicturePickerActivity : AppCompatActivity() {
         fun requestFromGallery(context: Context, listener: ((filePath: String) -> Unit)) {
             onTakePictureListener = listener
 
-            Intent(context, PicturePickerActivity::class.java).run {
+            Intent(context, ImageRequestActivity::class.java).run {
                 putExtra(EXTRA_ACTION, REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(this)
@@ -106,15 +106,7 @@ class PicturePickerActivity : AppCompatActivity() {
 
 
     private fun launchCameraIntent() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                REQUEST_CODE_PERMISSION_CAMERA
-            )
-        } else {
+        if (checkPermission(Manifest.permission.CAMERA)) {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             val imageFile = FileUtils.createImageFile(this)
             val imageUri = FileProvider.getUriForFile(
@@ -136,15 +128,7 @@ class PicturePickerActivity : AppCompatActivity() {
     }
 
     private fun launchGalleryIntent() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE
-            )
-        } else {
+        if (checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             if (intent.resolveActivity(packageManager) != null)
@@ -154,12 +138,30 @@ class PicturePickerActivity : AppCompatActivity() {
                     object : OnActivityResultListener {
                         override fun onResult(data: Intent?) {
                             onTakePictureListener?.invoke(
-                                data?.data?.getAbsolutePath(this@PicturePickerActivity) ?: ""
+                                data?.data?.getAbsolutePath(this@ImageRequestActivity) ?: ""
                             )
                         }
                     })
         }
 
+    }
+
+    private fun checkPermission(permission: String): Boolean {
+        return if (ContextCompat.checkSelfPermission(
+                this,
+                permission
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(permission),
+                REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE
+            )
+            false
+        } else {
+            true
+        }
     }
 
 }

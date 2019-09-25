@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
-import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.zdev.library.R
 import com.zdev.library.presenter.PictureMenuPresenter
@@ -147,11 +146,15 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     }
 
     override fun requestPictureFromCamera() {
-        launchCameraIntent(onTakePictureListener)
+        ImageRequestActivity.requestFromCamera(context) {
+            onTakePictureListener?.invoke(it)
+        }
     }
 
     override fun requestPictureFromGallery() {
-        launchGalleryIntent(onTakePictureListener)
+        ImageRequestActivity.requestFromGallery(context) {
+            onTakePictureListener?.invoke(it)
+        }
     }
 
     private fun showGalleryFab() {
@@ -162,20 +165,6 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     private fun showMainFab() {
         fabGallery.hide()
         fabMain.show()
-    }
-
-    private fun launchCameraIntent(onTakePictureListener: ((filePath: String) -> Unit)?) {
-        PicturePickerActivity.requestFromCamera(context) {
-            onTakePictureListener?.invoke(it)
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun launchGalleryIntent(onTakePictureListener: ((filePath: String) -> Unit)?) {
-        PicturePickerActivity.requestFromGallery(context) {
-            onTakePictureListener?.invoke(it)
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }
     }
 
     fun setOnTakePictureListener(onTakePictureListener: (filePath: String) -> Unit) {
