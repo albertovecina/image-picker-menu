@@ -6,6 +6,11 @@
 
     <application>
 
+        <activity
+            android:name=".view.PicturePickerActivity"
+            android:noHistory="true"
+            android:theme="@style/Theme.Transparent" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}"
@@ -15,6 +20,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
 
     </application>
 

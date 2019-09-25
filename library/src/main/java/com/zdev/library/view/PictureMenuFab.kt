@@ -7,15 +7,11 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
 import android.os.Build
-import android.provider.MediaStore
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
-import androidx.core.content.FileProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
@@ -23,8 +19,6 @@ import com.karumi.dexter.listener.single.BasePermissionListener
 import com.zdev.library.R
 import com.zdev.library.presenter.PictureMenuPresenter
 import com.zdev.library.presenter.PictureMenuPresenterImpl
-import com.zdev.library.utils.FileUtils
-import com.zdev.rentspace.view.utils.extensions.getAbsolutePath
 import kotlinx.android.synthetic.main.view_image_picker_menu.view.*
 
 
@@ -70,16 +64,14 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     var presenter: PictureMenuPresenter = PictureMenuPresenterImpl(this)
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
-        if (context is BaseActivity) {
-            LayoutInflater.from(context).inflate(R.layout.view_image_picker_menu, this)
+        LayoutInflater.from(context).inflate(R.layout.view_image_picker_menu, this)
 
-            if (attrs != null)
-                initAttributes(context, attrs)
+        fabMain.setOnClickListener { presenter.onMainButtonClick() }
+        fabGallery.setOnClickListener { presenter.onGalleryButtonClick() }
+        fabCamera.setOnClickListener { presenter.onCameraButtonClick() }
 
-            fabMain.setOnClickListener { presenter.onMainButtonClick() }
-            fabGallery.setOnClickListener { presenter.onGalleryButtonClick() }
-            fabCamera.setOnClickListener { presenter.onCameraButtonClick() }
-        }
+        if (attrs != null && context != null)
+            initAttributes(context, attrs)
     }
 
     private fun initAttributes(context: Context, attrs: AttributeSet) {
@@ -197,42 +189,14 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     }
 
     private fun launchCameraIntent(onTakePictureListener: ((filePath: String) -> Unit)?) {
-        with(context as BaseActivity) {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            val imageFile = FileUtils.createImageFile(this)
-            val imageUri = FileProvider.getUriForFile(
-                this,
-                packageName,
-                imageFile
-            )
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-            if (intent.resolveActivity(packageManager) != null)
-                startActivityForResult(
-                    intent,
-                    REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA,
-                    object : BaseActivity.OnActivityResultListener {
-                        override fun onResult(data: Intent?) {
-                            onTakePictureListener?.invoke(imageFile.absolutePath)
-                        }
-                    })
+        PicturePickerActivity.requestFromCamera(context) {
+            onTakePictureListener?.invoke(it)
         }
     }
 
     private fun launchGalleryIntent(onTakePictureListener: ((filePath: String) -> Unit)?) {
-        with(context as BaseActivity) {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            if (intent.resolveActivity(packageManager) != null)
-                startActivityForResult(
-                    intent,
-                    REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY,
-                    object : BaseActivity.OnActivityResultListener {
-                        override fun onResult(data: Intent?) {
-                            onTakePictureListener?.invoke(
-                                data?.data?.getAbsolutePath(context) ?: ""
-                            )
-                        }
-                    })
+        PicturePickerActivity.requestFromGallery(context) {
+            onTakePictureListener?.invoke(it)
         }
     }
 
