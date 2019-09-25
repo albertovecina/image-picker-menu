@@ -1,21 +1,16 @@
 package com.zdev.library.view
 
-import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
+import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.single.BasePermissionListener
 import com.zdev.library.R
 import com.zdev.library.presenter.PictureMenuPresenter
 import com.zdev.library.presenter.PictureMenuPresenterImpl
@@ -28,9 +23,6 @@ import kotlinx.android.synthetic.main.view_image_picker_menu.view.*
 class PictureMenuFab : RelativeLayout, PictureMenuView {
 
     companion object {
-        private const val REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA = 10
-        private const val REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY = 11
-
         const val ORIENTATION_LEFT = 0
         const val ORIENTATION_TOP = 1
     }
@@ -94,7 +86,7 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     }
 
     private fun configureFab(fab: FloatingActionButton, margin: Int, size: Int) {
-        val layoutParams = fab.layoutParams as RelativeLayout.LayoutParams
+        val layoutParams = fab.layoutParams as LayoutParams
         layoutParams.setMargins(margin, margin, margin, margin)
         fab.layoutParams = layoutParams
         fab.size = size
@@ -155,27 +147,11 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     }
 
     override fun requestPictureFromCamera() {
-        Dexter.withActivity(context as Activity)
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(object : BasePermissionListener() {
-                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                    launchCameraIntent(onTakePictureListener)
-                }
-            }).check()
+        launchCameraIntent(onTakePictureListener)
     }
 
     override fun requestPictureFromGallery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            Dexter.withActivity(context as Activity)
-                .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                .withListener(object : BasePermissionListener() {
-                    override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                        launchGalleryIntent(onTakePictureListener)
-                    }
-                }).check()
-        } else {
-            launchGalleryIntent(onTakePictureListener)
-        }
+        launchGalleryIntent(onTakePictureListener)
     }
 
     private fun showGalleryFab() {
@@ -191,12 +167,14 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     private fun launchCameraIntent(onTakePictureListener: ((filePath: String) -> Unit)?) {
         PicturePickerActivity.requestFromCamera(context) {
             onTakePictureListener?.invoke(it)
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun launchGalleryIntent(onTakePictureListener: ((filePath: String) -> Unit)?) {
         PicturePickerActivity.requestFromGallery(context) {
             onTakePictureListener?.invoke(it)
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 

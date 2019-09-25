@@ -1,12 +1,16 @@
 package com.zdev.library.view
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.zdev.library.utils.FileUtils
 import com.zdev.rentspace.view.utils.extensions.getAbsolutePath
@@ -23,6 +27,8 @@ class PicturePickerActivity : AppCompatActivity() {
 
         private const val REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA = 1
         private const val REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY = 2
+        private const val REQUEST_CODE_PERMISSION_CAMERA = 11
+        private const val REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE = 12
 
         private var onTakePictureListener: ((filePath: String) -> Unit)? = null
 
@@ -30,6 +36,7 @@ class PicturePickerActivity : AppCompatActivity() {
             onTakePictureListener = listener
             Intent(context, PicturePickerActivity::class.java).run {
                 putExtra(EXTRA_ACTION, REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(this)
             }
         }
@@ -40,6 +47,7 @@ class PicturePickerActivity : AppCompatActivity() {
 
             Intent(context, PicturePickerActivity::class.java).run {
                 putExtra(EXTRA_ACTION, REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(this)
             }
         }
@@ -52,6 +60,24 @@ class PicturePickerActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK)
             activityResultListenerMap[requestCode]?.onResult(data)
+        finish()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            REQUEST_CODE_PERMISSION_CAMERA -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                    launchCameraIntent()
+            }
+            REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                    launchGalleryIntent()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,41 +106,60 @@ class PicturePickerActivity : AppCompatActivity() {
 
 
     private fun launchCameraIntent() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val imageFile = FileUtils.createImageFile(this)
-        val imageUri = FileProvider.getUriForFile(
-            this,
-            packageName,
-            imageFile
-        )
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-        if (intent.resolveActivity(packageManager) != null)
-            startActivityForResult(
-                intent,
-                REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA,
-                object : OnActivityResultListener {
-                    override fun onResult(data: Intent?) {
-                        onTakePictureListener?.invoke(imageFile.absolutePath)
-                        finish()
-                    }
-                })
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CODE_PERMISSION_CAMERA
+            )
+        } else {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val imageFile = FileUtils.createImageFile(this)
+            val imageUri = FileProvider.getUriForFile(
+                this,
+                packageName,
+                imageFile
+            )
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            if (intent.resolveActivity(packageManager) != null)
+                startActivityForResult(
+                    intent,
+                    REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA,
+                    object : OnActivityResultListener {
+                        override fun onResult(data: Intent?) {
+                            onTakePictureListener?.invoke(imageFile.absolutePath)
+                        }
+                    })
+        }
     }
 
     private fun launchGalleryIntent() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        if (intent.resolveActivity(packageManager) != null)
-            startActivityForResult(
-                intent,
-                REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY,
-                object : OnActivityResultListener {
-                    override fun onResult(data: Intent?) {
-                        onTakePictureListener?.invoke(
-                            data?.data?.getAbsolutePath(this@PicturePickerActivity) ?: ""
-                        )
-                        finish()
-                    }
-                })
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE
+            )
+        } else {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            if (intent.resolveActivity(packageManager) != null)
+                startActivityForResult(
+                    intent,
+                    REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY,
+                    object : OnActivityResultListener {
+                        override fun onResult(data: Intent?) {
+                            onTakePictureListener?.invoke(
+                                data?.data?.getAbsolutePath(this@PicturePickerActivity) ?: ""
+                            )
+                        }
+                    })
+        }
+
     }
 
 }

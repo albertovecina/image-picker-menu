@@ -8,7 +8,6 @@
 
         <activity
             android:name=".view.PicturePickerActivity"
-            android:noHistory="true"
             android:theme="@style/Theme.Transparent" />
 
         <provider
