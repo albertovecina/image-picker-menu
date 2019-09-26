@@ -1,4 +1,4 @@
-package com.zdev.library.view
+package com.zdev.picturepickermenu.view
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -10,9 +10,9 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.zdev.library.R
-import com.zdev.library.presenter.PictureMenuPresenter
-import com.zdev.library.presenter.PictureMenuPresenterImpl
+import com.zdev.picturepickermenu.R
+import com.zdev.picturepickermenu.presenter.PictureMenuPresenter
+import com.zdev.picturepickermenu.presenter.PictureMenuPresenterImpl
 import kotlinx.android.synthetic.main.view_image_picker_menu.view.*
 
 
@@ -52,7 +52,7 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
 
     private var onTakePictureListener: ((filePath: String) -> Unit)? = null
 
-    var presenter: PictureMenuPresenter = PictureMenuPresenterImpl(this)
+    private var presenter: PictureMenuPresenter = PictureMenuPresenterImpl(this)
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
         LayoutInflater.from(context).inflate(R.layout.view_image_picker_menu, this)
@@ -68,14 +68,11 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     private fun initAttributes(context: Context, attrs: AttributeSet) {
         gravity = Gravity.BOTTOM or Gravity.END
 
-        var typedArray = context.obtainStyledAttributes(attrs, R.styleable.PictureMenuFab)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PictureMenuFab)
         val iconResId = typedArray.getResourceId(R.styleable.PictureMenuFab_icon, 0)
         orientation = typedArray.getInt(R.styleable.PictureMenuFab_orientation, ORIENTATION_TOP)
         margin = typedArray.getDimensionPixelSize(R.styleable.PictureMenuFab_buttonMargin, 0)
-        typedArray.recycle()
-
-        typedArray = context.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton)
-        val fabSize = typedArray.getInt(R.styleable.FloatingActionButton_fabSize, 0)
+        val fabSize = typedArray.getInt(R.styleable.PictureMenuFab_buttonSize, 0)
         typedArray.recycle()
 
         fabMain.setImageResource(iconResId)
@@ -146,13 +143,13 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     }
 
     override fun requestPictureFromCamera() {
-        ImageRequestActivity.requestFromCamera(context) {
+        PictureRequestActivity.requestFromCamera(context) {
             onTakePictureListener?.invoke(it)
         }
     }
 
     override fun requestPictureFromGallery() {
-        ImageRequestActivity.requestFromGallery(context) {
+        PictureRequestActivity.requestFromGallery(context) {
             onTakePictureListener?.invoke(it)
         }
     }

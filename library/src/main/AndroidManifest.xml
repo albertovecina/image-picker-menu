@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zdev.library">
+    package="com.zdev.picturepickermenu">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -7,7 +7,7 @@
     <application>
 
         <activity
-            android:name=".view.ImageRequestActivity"
+            android:name="com.zdev.picturepickermenu.view.PictureRequestActivity"
             android:theme="@style/Theme.Transparent" />
 
         <provider

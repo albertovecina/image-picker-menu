@@ -1,4 +1,4 @@
-package com.zdev.library.view
+package com.zdev.picturepickermenu.view
 
 import android.Manifest
 import android.app.Activity
@@ -12,14 +12,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.zdev.library.utils.FileUtils
-import com.zdev.rentspace.view.utils.extensions.getAbsolutePath
+import com.zdev.picturepickermenu.utils.FileUtils
+import com.zdev.picturepickermenu.utils.extensions.getAbsolutePath
 
 
 /**
  * Created by Alberto Vecina Sánchez on 2019-09-13.
  */
-class ImageRequestActivity : AppCompatActivity() {
+class PictureRequestActivity : AppCompatActivity() {
 
     companion object {
 
@@ -34,7 +34,7 @@ class ImageRequestActivity : AppCompatActivity() {
 
         fun requestFromCamera(context: Context, listener: ((filePath: String) -> Unit)) {
             onTakePictureListener = listener
-            Intent(context, ImageRequestActivity::class.java).run {
+            Intent(context, PictureRequestActivity::class.java).run {
                 putExtra(EXTRA_ACTION, REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(this)
@@ -45,7 +45,7 @@ class ImageRequestActivity : AppCompatActivity() {
         fun requestFromGallery(context: Context, listener: ((filePath: String) -> Unit)) {
             onTakePictureListener = listener
 
-            Intent(context, ImageRequestActivity::class.java).run {
+            Intent(context, PictureRequestActivity::class.java).run {
                 putExtra(EXTRA_ACTION, REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(this)
@@ -54,12 +54,12 @@ class ImageRequestActivity : AppCompatActivity() {
 
     }
 
-    private val activityResultListenerMap: MutableMap<Int, OnActivityResultListener> = HashMap()
+    private val activityResultListenerMap: MutableMap<Int, (Intent?) -> Unit> = HashMap()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK)
-            activityResultListenerMap[requestCode]?.onResult(data)
+            activityResultListenerMap[requestCode]?.invoke(data)
         finish()
     }
 
@@ -94,19 +94,14 @@ class ImageRequestActivity : AppCompatActivity() {
     private fun startActivityForResult(
         intent: Intent?,
         requestCode: Int,
-        listener: OnActivityResultListener
+        listener: (Intent?) -> Unit
     ) {
         activityResultListenerMap[requestCode] = listener
         startActivityForResult(intent, requestCode)
     }
 
-    interface OnActivityResultListener {
-        fun onResult(data: Intent?)
-    }
-
-
     private fun launchCameraIntent() {
-        if (checkPermission(Manifest.permission.CAMERA)) {
+        if (checkPermission(Manifest.permission.CAMERA, REQUEST_CODE_PERMISSION_CAMERA)) {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             val imageFile = FileUtils.createImageFile(this)
             val imageUri = FileProvider.getUriForFile(
@@ -118,35 +113,35 @@ class ImageRequestActivity : AppCompatActivity() {
             if (intent.resolveActivity(packageManager) != null)
                 startActivityForResult(
                     intent,
-                    REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA,
-                    object : OnActivityResultListener {
-                        override fun onResult(data: Intent?) {
-                            onTakePictureListener?.invoke(imageFile.absolutePath)
-                        }
-                    })
+                    REQUEST_CODE_TAKE_PHOTO_FROM_CAMERA
+                ) {
+                    onTakePictureListener?.invoke(imageFile.absolutePath)
+                }
         }
     }
 
     private fun launchGalleryIntent() {
-        if (checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (checkPermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE.hashCode()
+            )
+        ) {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             if (intent.resolveActivity(packageManager) != null)
                 startActivityForResult(
                     intent,
-                    REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY,
-                    object : OnActivityResultListener {
-                        override fun onResult(data: Intent?) {
-                            onTakePictureListener?.invoke(
-                                data?.data?.getAbsolutePath(this@ImageRequestActivity) ?: ""
-                            )
-                        }
-                    })
+                    REQUEST_CODE_TAKE_PHOTO_FROM_GALLERY
+                ) {
+                    onTakePictureListener?.invoke(
+                        it?.data?.getAbsolutePath(this@PictureRequestActivity) ?: ""
+                    )
+                }
         }
 
     }
 
-    private fun checkPermission(permission: String): Boolean {
+    private fun checkPermission(permission: String, requestCode: Int): Boolean {
         return if (ContextCompat.checkSelfPermission(
                 this,
                 permission
@@ -156,7 +151,7 @@ class ImageRequestActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(permission),
-                REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE
+                requestCode
             )
             false
         } else {

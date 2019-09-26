@@ -8,13 +8,13 @@
     android:padding="30dp"
     tools:context=".MainActivity">
 
-    <com.zdev.library.view.PictureMenuFab
+    <com.zdev.picturepickermenu.view.PictureMenuFab
         android:id="@+id/fabPictureMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         app:buttonMargin="@dimen/fab_button_margin"
-        app:fabSize="mini"
+        app:buttonSize="mini"
         app:icon="@drawable/ic_picture"
         app:orientation="left" />
 
