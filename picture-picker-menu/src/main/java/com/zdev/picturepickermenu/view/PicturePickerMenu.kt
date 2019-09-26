@@ -71,7 +71,10 @@ class PicturePickerMenu : RelativeLayout, PicturePickerView {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PicturePickerMenu)
         val iconResId = typedArray.getResourceId(R.styleable.PicturePickerMenu_icon, 0)
         orientation = typedArray.getInt(R.styleable.PicturePickerMenu_orientation, ORIENTATION_TOP)
-        margin = typedArray.getDimensionPixelSize(R.styleable.PicturePickerMenu_ppmButtonMargin, 0)
+        margin = typedArray.getDimensionPixelSize(
+            R.styleable.PicturePickerMenu_ppmButtonMargin,
+            context.resources.getDimensionPixelSize(R.dimen.menu_button_margin)
+        )
         val fabSize = typedArray.getInt(R.styleable.PicturePickerMenu_ppmButtonSize, 0)
         typedArray.recycle()
 

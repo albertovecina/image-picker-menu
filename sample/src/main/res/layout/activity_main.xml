@@ -13,8 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        app:buttonMargin="@dimen/fab_button_margin"
-        app:buttonSize="mini"
+        app:ppmButtonSize="normal"
         app:icon="@drawable/ic_picture"
         app:orientation="left" />
 
