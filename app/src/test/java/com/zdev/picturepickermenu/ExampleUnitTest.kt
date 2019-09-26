@@ -1,4 +1,4 @@
-package com.zdev.imagepickermenu
+package com.zdev.picturepickermenu
 
 import org.junit.Test
 

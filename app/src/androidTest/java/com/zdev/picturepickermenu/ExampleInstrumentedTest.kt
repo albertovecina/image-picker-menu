@@ -1,4 +1,4 @@
-package com.zdev.imagepickermenu
+package com.zdev.picturepickermenu
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PictureMenuFab">
+        <attr name="buttonMargin" format="dimension" />
+        <attr name="icon" format="reference" />
+        <attr name="orientation" format="enum">
+            <enum name="left" value="0" />
+            <enum name="top" value="1" />
+        </attr>
+        <attr name="buttonSize" format="enum">
+            <enum name="auto" value="-1" />
+            <enum name="normal" value="0" />
+            <enum name="mini" value="1" />
+        </attr>
+    </declare-styleable>
+
+</resources>
