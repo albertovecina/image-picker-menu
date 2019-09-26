@@ -38,7 +38,7 @@ androidExtensions {
 }
 
 publish {
-    userOrg = 'zdev'
+    userOrg = 'albertovecina'
     groupId = 'com.zdev'
     artifactId = 'picture-picker-menu'
     publishVersion = project.versionName

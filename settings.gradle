@@ -1,2 +1,2 @@
-include ':app', ':library'
+include ':sample', ':picture-picker-menu'
 rootProject.name='Picture Picker Menu'
