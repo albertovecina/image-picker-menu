@@ -3,7 +3,7 @@ package com.zdev.picturepickermenu.view
 /**
  * Created by Alberto Vecina Sánchez on 27/02/2019.
  */
-interface PictureMenuView {
+interface PicturePickerView {
 
     fun showMenu()
 

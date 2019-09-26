@@ -11,15 +11,15 @@ import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.zdev.picturepickermenu.R
-import com.zdev.picturepickermenu.presenter.PictureMenuPresenter
-import com.zdev.picturepickermenu.presenter.PictureMenuPresenterImpl
+import com.zdev.picturepickermenu.presenter.PicturePickerPresenter
+import com.zdev.picturepickermenu.presenter.PicturePickerPresenterImpl
 import kotlinx.android.synthetic.main.view_image_picker_menu.view.*
 
 
 /**
  * Created by Alberto Vecina Sánchez on 26/02/19.
  */
-class PictureMenuFab : RelativeLayout, PictureMenuView {
+class PicturePickerMenu : RelativeLayout, PicturePickerView {
 
     companion object {
         const val ORIENTATION_LEFT = 0
@@ -52,7 +52,7 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
 
     private var onTakePictureListener: ((filePath: String) -> Unit)? = null
 
-    private var presenter: PictureMenuPresenter = PictureMenuPresenterImpl(this)
+    private var presenter: PicturePickerPresenter = PicturePickerPresenterImpl(this)
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
         LayoutInflater.from(context).inflate(R.layout.view_image_picker_menu, this)
@@ -68,11 +68,14 @@ class PictureMenuFab : RelativeLayout, PictureMenuView {
     private fun initAttributes(context: Context, attrs: AttributeSet) {
         gravity = Gravity.BOTTOM or Gravity.END
 
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PictureMenuFab)
-        val iconResId = typedArray.getResourceId(R.styleable.PictureMenuFab_icon, 0)
-        orientation = typedArray.getInt(R.styleable.PictureMenuFab_orientation, ORIENTATION_TOP)
-        margin = typedArray.getDimensionPixelSize(R.styleable.PictureMenuFab_buttonMargin, 0)
-        val fabSize = typedArray.getInt(R.styleable.PictureMenuFab_buttonSize, 0)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PicturePickerMenu)
+        val iconResId = typedArray.getResourceId(R.styleable.PicturePickerMenu_icon, 0)
+        orientation = typedArray.getInt(R.styleable.PicturePickerMenu_orientation, ORIENTATION_TOP)
+        margin = typedArray.getDimensionPixelSize(
+            R.styleable.PicturePickerMenu_ppmButtonMargin,
+            context.resources.getDimensionPixelSize(R.dimen.menu_button_margin)
+        )
+        val fabSize = typedArray.getInt(R.styleable.PicturePickerMenu_ppmButtonSize, 0)
         typedArray.recycle()
 
         fabMain.setImageResource(iconResId)
