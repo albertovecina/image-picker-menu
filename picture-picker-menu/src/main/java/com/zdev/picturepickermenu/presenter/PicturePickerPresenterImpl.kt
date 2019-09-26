@@ -1,12 +1,12 @@
 package com.zdev.picturepickermenu.presenter
 
-import com.zdev.picturepickermenu.view.PictureMenuView
+import com.zdev.picturepickermenu.view.PicturePickerView
 
 
 /**
  * Created by Alberto Vecina Sánchez on 27/02/2019.
  */
-class PictureMenuPresenterImpl constructor(var view: PictureMenuView) : PictureMenuPresenter() {
+class PicturePickerPresenterImpl constructor(var view: PicturePickerView) : PicturePickerPresenter() {
 
     private var isOpen: Boolean = false
 
