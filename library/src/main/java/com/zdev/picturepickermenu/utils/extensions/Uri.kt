@@ -1,9 +1,8 @@
-package com.zdev.rentspace.view.utils.extensions
+package com.zdev.picturepickermenu.utils.extensions
 
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import java.io.File
 
 /**
  * Created by Alberto Vecina Sánchez on 29/01/2019.
@@ -12,9 +11,10 @@ import java.io.File
 /** Returns the absolute path for the file referenced by the [Uri] **/
 fun Uri.getAbsolutePath(context: Context?): String {
     if (context == null)
-        return path
+        return path ?: ""
 
-    val cursor = context.contentResolver.query(this, arrayOf(MediaStore.Images.Media.DATA), null, null, null)
+    val cursor =
+        context.contentResolver.query(this, arrayOf(MediaStore.Images.Media.DATA), null, null, null)
 
     return if (cursor != null) {
         cursor.moveToFirst()
@@ -23,10 +23,6 @@ fun Uri.getAbsolutePath(context: Context?): String {
         cursor.close()
         filePath
     } else {
-        path
+        path ?: ""
     }
 }
-
-
-/** Creates a [File] from the given [Uri]. */
-fun Uri.toFile(context: Context?) = File(getAbsolutePath(context))

@@ -1,4 +1,4 @@
-package com.zdev.library.utils
+package com.zdev.picturepickermenu.utils
 
 import android.content.Context
 import android.os.Environment
@@ -14,12 +14,13 @@ object FileUtils {
     @JvmStatic
     fun createImageFile(context: Context): File {
         // Create an image file activityName
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val file = File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
         )
         file.deleteOnExit()
         return file

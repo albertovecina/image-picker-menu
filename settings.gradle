@@ -1,2 +1,2 @@
 include ':app', ':library'
-rootProject.name='Image Picker Menu'
+rootProject.name='Picture Picker Menu'

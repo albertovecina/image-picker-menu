@@ -8,6 +8,11 @@
             <enum name="left" value="0" />
             <enum name="top" value="1" />
         </attr>
+        <attr name="buttonSize" format="enum">
+            <enum name="auto" value="-1" />
+            <enum name="normal" value="0" />
+            <enum name="mini" value="1" />
+        </attr>
     </declare-styleable>
 
 </resources>

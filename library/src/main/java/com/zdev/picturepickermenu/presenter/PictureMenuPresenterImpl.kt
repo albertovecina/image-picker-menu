@@ -1,6 +1,6 @@
-package com.zdev.library.presenter
+package com.zdev.picturepickermenu.presenter
 
-import com.zdev.library.view.PictureMenuView
+import com.zdev.picturepickermenu.view.PictureMenuView
 
 
 /**
